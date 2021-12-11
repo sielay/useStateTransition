@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { waitFor} from '@testing-library/react';
+import { waitFor } from "@testing-library/react";
 import { act, renderHook } from "@testing-library/react-hooks";
 import { useStateTransition } from "../useStateTransition";
 
@@ -39,6 +39,34 @@ describe("useStateTransition", () => {
       });
       expect(result.current.state).toBe(State.FOCUSED);
       expect(result.current.error).toBeTruthy();
+
+      act(() => {
+        result.current.dispatch(State.FOCUSED);
+      });
+      expect(result.current.state).toBe(State.FOCUSED);
+      expect(result.current.error).toBeFalsy();
+    });
+    it("Crashes on duplicate flows", () => {
+      const result = renderHook(() =>
+        useStateTransition<number>({
+          initial: 0,
+          flows: [
+            {
+              from: 0,
+              to: 1,
+            },
+            {
+              from: [0, 1],
+              to: 1,
+            },
+            {
+              from: 0,
+              to: 1,
+            },
+          ],
+        })
+      );
+      expect(result.result.error).toBeTruthy();
     });
   });
 });

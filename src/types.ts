@@ -1,12 +1,12 @@
-export type Dispatch<StateType> = (requiredState: StateType) => void;
+export type Dispatch<StateType> = (requiredState: StateType, data?: unknown) => void;
 
 export interface StateTransitionFlow<StateType> {
   from: StateType | StateType[];
   to: StateType | StateType[];
   on?: (
-    previousState: StateType,
     requestedState: StateType,
-    setState: Dispatch<StateType>
+    setState: Dispatch<StateType>,
+    data?: unknown
   ) => void;
 }
 
@@ -25,3 +25,8 @@ export type UseStateTransitionResult<StateType> = {
   dispatch: Dispatch<StateType>;
   error?: Error;
 };
+
+export interface TransitionRequest<StateType> {
+  to: StateType;
+  data?: unknown;
+}

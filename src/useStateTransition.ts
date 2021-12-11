@@ -1,7 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    FlowHash, UseStateTransitionOptions,
-    UseStateTransitionResult
+  FlowHash,
+  UseStateTransitionOptions,
+  UseStateTransitionResult,
+  Dispatch,
+  TransitionRequest,
 } from "./types";
 
 export const useStateTransition = <StateType>({
@@ -9,8 +12,10 @@ export const useStateTransition = <StateType>({
   flows,
 }: UseStateTransitionOptions<StateType>): UseStateTransitionResult<StateType> => {
   const [state, setState] = useState<StateType>(initial);
-  const [previousState, setPreviousState] = useState<StateType>(initial);
   const [error, setError] = useState<Error | undefined>();
+  const [transitionRequest, setTransitionRequest] = useState<
+    TransitionRequest<StateType> | undefined
+  >(undefined);
 
   const createKey = (from: StateType, to: StateType) =>
     JSON.stringify([from, to]);
@@ -24,10 +29,11 @@ export const useStateTransition = <StateType>({
         fromList.forEach((from) =>
           toList.forEach((to) => {
             const key = createKey(from, to);
-            if (hash[key])
+            if (hash[key]) {
               throw new Error(
                 `Duplicate state transition from ${from} to ${to}`
               );
+            }
             hash[key] = flow;
           })
         );
@@ -39,23 +45,31 @@ export const useStateTransition = <StateType>({
   }, [flows]);
 
   const dispatch: Dispatch<StateType> = useCallback(
-    (requiredState: StateType) => {
-      if (requiredState === state) return;
-      const transitionKey = createKey(state, requiredState);
-      const transition = flowHash[transitionKey];
-      if (!transition) {
-        return setError(
-          new Error(`Undefined transition from ${state} to ${requiredState}`)
-        );
-      }
-      const { on } = transition;
-      if (!on) {
-        return setState(requiredState);
-      }
-      on(previousState, requiredState, setState);
+    (requiredState: StateType, data?: unknown) => {
+      setTransitionRequest({
+        to: requiredState,
+        data,
+      });
     },
-    [previousState, state, flowHash, setState, setError]
+    [setTransitionRequest]
   );
+
+  useEffect(() => {
+    if (!transitionRequest) return setError(undefined);
+    const { to, data } = transitionRequest;
+    if (to === state) return setError(undefined);
+    const transitionKey = createKey(state, to);
+    const transition = flowHash[transitionKey];
+    if (!transition) {
+      return setError(new Error(`Undefined transition from ${state} to ${to}`));
+    }
+    setError(undefined);
+    const { on } = transition;
+    if (!on) {
+      return setState(to);
+    }
+    on(to, setState, data);
+  }, [transitionRequest]);
 
   return { state, dispatch, error };
 };

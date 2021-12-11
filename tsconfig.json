@@ -16,7 +16,8 @@
     "incremental": false,
     "strictFunctionTypes": false,
     "isolatedModules": true,
-    "declaration": true
+    "declaration": true,
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }
