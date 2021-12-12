@@ -1,20 +1,33 @@
 import '@testing-library/jest-dom/extend-expect';
 import { fireEvent, render, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react-hooks';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Editor } from '../Editor';
 import { EditorState } from '../types';
-import { useEditor } from '../useEditor';
+import { useEditor, EditorProvider, Editor } from '../context';
 
-describe('useEditor example', () => {
+describe('context example', () => {
   it('it is a function', () => {
     expect(useEditor).toBeInstanceOf(Function);
+    expect(EditorProvider).toBeInstanceOf(Function);
+  });
+  it('throws without a context', () => {
+    const { result } = renderHook(useEditor);
+    expect(result.error).toBeTruthy();
+  });
+  it('start with a context', () => {
+    const { result } = renderHook(useEditor, { wrapper: EditorProvider });
+    expect(result.error).toBeFalsy();
   });
 });
 
 describe('Editor', () => {
   it('supports new content lifecycle', async () => {
-    const screen = render(<Editor scenario="new" />);
+    const screen = render(
+      <EditorProvider scenario="new">
+        <Editor />
+      </EditorProvider>
+    );
     const { queryByText, queryByTestId } = screen;
 
     expect(queryByText('Invalid')).not.toBeInTheDocument();
@@ -63,11 +76,15 @@ describe('Editor', () => {
     userEvent.click(queryByText('Save'));
 
     await waitFor(() => expect(queryByTestId('modified').textContent).toEqual('false'));
-    expect(queryByTestId('state').textContent).toEqual(EditorState.CLOSED);
+    expect(queryByTestId('state')).not.toBeInTheDocument();
   });
 
   it('supports new content lifecycle', async () => {
-    const screen = render(<Editor scenario="load" />);
+    const screen = render(
+      <EditorProvider scenario="load">
+        <Editor />
+      </EditorProvider>
+    );
     const { queryByText, queryByTestId } = screen;
 
     expect(queryByText('Invalid')).not.toBeInTheDocument();

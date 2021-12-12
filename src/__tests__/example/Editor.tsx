@@ -1,5 +1,6 @@
-import React, { FC, useState } from "react";
-import { EditorState, TestScenario, useEditor } from "./useEditor";
+import React, { FC, useState } from 'react';
+import { EditorState, TestScenario } from './types';
+import { useEditor } from './useEditor';
 
 export const Editor: FC<{
   scenario: TestScenario;
@@ -20,10 +21,7 @@ export const Editor: FC<{
         </button>
       )}
       {state === EditorState.LOAD && (
-        <button
-          key="load"
-          onClick={() => dispatch(EditorState.OPEN, { id: 123 })}
-        >
+        <button key="load" onClick={() => dispatch(EditorState.OPEN, { id: 123 })}>
           Load from storage
         </button>
       )}
@@ -56,10 +54,7 @@ export const Editor: FC<{
             dispatch(EditorState.SAVING);
             setTimeout(() => {
               setModified(false);
-              const next =
-                state === EditorState.CLOSE
-                  ? EditorState.CLOSED
-                  : EditorState.OPEN;
+              const next = state === EditorState.CLOSE ? EditorState.CLOSED : EditorState.OPEN;
               dispatch(next);
             }, 10);
           }}
@@ -79,7 +74,7 @@ export const Editor: FC<{
       )}
 
       <pre data-testid="state">{state}</pre>
-      <pre data-testid="modified">{modified ? "true" : "false"}</pre>
+      <pre data-testid="modified">{modified ? 'true' : 'false'}</pre>
     </div>
   );
 };

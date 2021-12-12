@@ -1,5 +1,6 @@
-import { FC, useCallback, useState, ReactNode, useEffect } from "react";
-import { useStateTransition } from "../../useStateTransition";
+import { FC, useCallback, useState, ReactNode, useEffect } from 'react';
+import { useStateTransition } from '../../useStateTransition';
+import { TestScenario, EditorState, StatesEditorCanEnter } from './types';
 
 /**
  * This is a simplified scenario, in which I'd like to use this hook.
@@ -12,26 +13,6 @@ import { useStateTransition } from "../../useStateTransition";
 /**
  *
  */
-export enum EditorState {
-  INIT = "init",
-  READY = "ready",
-  NEW = "new",
-  LOAD = "load",
-  OPEN = "open",
-  MODIFIED = "modified",
-  CLOSE = "close",
-  CLOSED = "closed",
-  SAVING = "saving",
-}
-
-export type StatesEditorCanEnter =
-  | EditorState.READY
-  | EditorState.OPEN
-  | EditorState.MODIFIED
-  | EditorState.CLOSED
-  | EditorState.SAVING;
-
-export type TestScenario = "new" | "load";
 
 export const useEditor = (scenario: TestScenario) => {
   // State machine
@@ -42,36 +23,36 @@ export const useEditor = (scenario: TestScenario) => {
         from: EditorState.INIT,
         to: EditorState.READY,
         on: (_, setState) => {
-          setState(scenario === "new" ? EditorState.NEW : EditorState.LOAD);
-        },
+          setState(scenario === 'new' ? EditorState.NEW : EditorState.LOAD);
+        }
       },
       {
         from: [EditorState.NEW, EditorState.LOAD],
-        to: EditorState.OPEN,
+        to: EditorState.OPEN
       },
       {
         from: [EditorState.OPEN, EditorState.MODIFIED, EditorState.CLOSE],
-        to: [EditorState.MODIFIED, EditorState.OPEN, EditorState.CLOSE],
+        to: [EditorState.MODIFIED, EditorState.OPEN, EditorState.CLOSE]
       },
       {
         from: [EditorState.CLOSE, EditorState.MODIFIED],
-        to: EditorState.SAVING,
+        to: EditorState.SAVING
       },
       {
         from: EditorState.SAVING,
-        to: [EditorState.OPEN, EditorState.CLOSED],
-      },
-    ],
+        to: [EditorState.OPEN, EditorState.CLOSED]
+      }
+    ]
   });
 
   useEffect(() => {
     const close = ({ data }: MessageEvent) => {
-      if (data === "close") {
+      if (data === 'close') {
         dispatch(EditorState.CLOSE);
       }
     };
-    window.addEventListener("message", close);
-    return () => window.removeEventListener("message", close);
+    window.addEventListener('message', close);
+    return () => window.removeEventListener('message', close);
   }, [dispatch]);
 
   const externalDispatch = useCallback(
