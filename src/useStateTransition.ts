@@ -10,6 +10,9 @@ import {
   StaticTransitionRequest,
   DispatchFunction
 } from './types';
+import debug from 'debug';
+
+const log = debug('useStateTransition');
 
 export const useStateTransition = <StateType extends BaseStateType>({
   initial,
@@ -18,6 +21,8 @@ export const useStateTransition = <StateType extends BaseStateType>({
   const [state, setState] = useState<StateType>(initial);
   const [error, setError] = useState<Error | undefined>();
   const [transitionRequest, setTransitionRequest] = useState<TransitionRequest<StateType> | undefined>(undefined);
+
+  log('current state', state, 'error: ', error);
 
   const createKey = (from: StateType, to: StateType) => JSON.stringify([from, to]);
 
@@ -42,6 +47,7 @@ export const useStateTransition = <StateType extends BaseStateType>({
 
   const dispatch: Dispatch<StateType> = useCallback(
     (requiredState: StateType, data?: unknown) => {
+      log('dispatch', requiredState, data);
       setTransitionRequest({
         to: requiredState,
         data
@@ -52,6 +58,7 @@ export const useStateTransition = <StateType extends BaseStateType>({
 
   const dispatchFn: DispatchFunction<StateType> = useCallback(
     (requiredState: DispatchMapFunction<StateType>, data?: unknown) => {
+      log('dispatchFn', requiredState, data);
       setTransitionRequest({
         to: requiredState,
         data
@@ -61,7 +68,10 @@ export const useStateTransition = <StateType extends BaseStateType>({
   );
 
   useEffect(() => {
-    if (!transitionRequest) return setError(undefined);
+    if (!transitionRequest) {
+      log('empty request - abandon');
+      return setError(undefined);
+    }
     const { to: requestedState, data: givenData } = transitionRequest;
 
     const functionState = () => {
@@ -69,6 +79,7 @@ export const useStateTransition = <StateType extends BaseStateType>({
       if (!mapped) {
         throw new Error('Dispatch map function returned no target state');
       }
+      log('mapped request', mapped);
       return mapped;
     };
 
@@ -77,7 +88,11 @@ export const useStateTransition = <StateType extends BaseStateType>({
         ? functionState()
         : (transitionRequest as StaticTransitionRequest<StateType>);
 
-    if (to === state) return setError(undefined);
+    if (to === state) {
+      log('pointless reques - abandon');
+      return setError(undefined);
+    }
+    log(`tranition from ${state} to ${to}`);
     const transitionKey = createKey(state, to);
     const transition = flowHash[transitionKey];
     if (!transition) {
@@ -86,8 +101,10 @@ export const useStateTransition = <StateType extends BaseStateType>({
     setError(undefined);
     const { on } = transition;
     if (!on) {
+      log(`no guard transition from ${state} to ${to}, update state`);
       return setState(to);
     }
+    log(`guard transition from ${state} to ${to}, update state`);
     on(to, setState, data);
   }, [transitionRequest]);
 
