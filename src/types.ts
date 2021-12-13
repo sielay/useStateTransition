@@ -5,12 +5,12 @@ export type DispatchMapFunction<StateType extends BaseStateType> = (
   currentState: StateType,
   data?: unknown
 ) => DispatchMapFunctionResult<StateType>;
-export type DispatchFunction<StateType extends BaseStateType> = (mapFunction: DispatchMapFunction<StateType>) => void;
-
-export type Dispatch<StateType extends BaseStateType> = (
-  requiredState: StateType,
+export type DispatchFunction<StateType extends BaseStateType> = (
+  mapFunction: DispatchMapFunction<StateType>,
   data?: unknown
-) => void | DispatchFunction<StateType>;
+) => void;
+
+export type Dispatch<StateType extends BaseStateType> = (requiredState: StateType, data?: unknown) => void;
 
 export interface StateTransitionFlow<StateType extends BaseStateType> {
   from: StateType | StateType[];
@@ -28,6 +28,7 @@ export interface UseStateTransitionOptions<StateType extends BaseStateType> {
 export type UseStateTransitionResult<StateType extends BaseStateType> = {
   state: StateType;
   dispatch: Dispatch<StateType>;
+  dispatchFn: DispatchFunction<StateType>;
   error?: Error;
 };
 

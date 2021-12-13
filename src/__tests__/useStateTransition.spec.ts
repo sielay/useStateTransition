@@ -96,10 +96,11 @@ describe('useStateTransition', () => {
         if (state === 2) {
           return { to: 1 };
         }
+        return { to: 0 };
       };
 
       act(() => {
-        result.current.dispatch(mapper);
+        result.current.dispatchFn(mapper);
       });
 
       expect(result.current.error).toBeUndefined();
@@ -111,7 +112,7 @@ describe('useStateTransition', () => {
       expect(result.current.error).toBeUndefined();
       expect(result.current.state).toEqual(2);
       act(() => {
-        result.current.dispatch(mapper);
+        result.current.dispatchFn(mapper);
       });
       expect(result.current.error).toBeUndefined();
       expect(result.current.state).toEqual(1);

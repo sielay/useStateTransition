@@ -7,7 +7,8 @@ import {
   TransitionRequest,
   BaseStateType,
   DispatchMapFunction,
-  StaticTransitionRequest
+  StaticTransitionRequest,
+  DispatchFunction
 } from './types';
 
 export const useStateTransition = <StateType extends BaseStateType>({
@@ -40,7 +41,17 @@ export const useStateTransition = <StateType extends BaseStateType>({
   }, [flows]);
 
   const dispatch: Dispatch<StateType> = useCallback(
-    (requiredState: StateType | DispatchMapFunction<StateType>, data?: unknown) => {
+    (requiredState: StateType, data?: unknown) => {
+      setTransitionRequest({
+        to: requiredState,
+        data
+      });
+    },
+    [setTransitionRequest]
+  );
+
+  const dispatchFn: DispatchFunction<StateType> = useCallback(
+    (requiredState: DispatchMapFunction<StateType>, data?: unknown) => {
       setTransitionRequest({
         to: requiredState,
         data
@@ -80,5 +91,5 @@ export const useStateTransition = <StateType extends BaseStateType>({
     on(to, setState, data);
   }, [transitionRequest]);
 
-  return { state, dispatch, error };
+  return { state, dispatch, dispatchFn, error };
 };

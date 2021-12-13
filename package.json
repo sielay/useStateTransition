@@ -1,7 +1,7 @@
 {
   "name": "usestatetransition",
   "main": "build/index.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Other flavor of a state machine hook",
   "author": "Łukasz Marek Sielski <lukaszsielski@gmail.com>",
   "repository": {

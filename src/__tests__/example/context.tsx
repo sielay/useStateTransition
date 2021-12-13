@@ -3,7 +3,7 @@ import { EditorState, StatesEditorCanEnter, TestScenario } from './types';
 import { useStateTransition } from '../../useStateTransition';
 import { UseStateTransitionResult, Dispatch } from '../../types';
 
-const EditorContext = createContext<UseStateTransitionResult<EditorState> | null>(null);
+const EditorContext = createContext<Omit<UseStateTransitionResult<EditorState>, 'dispatchFn'> | null>(null);
 
 export function EditorProvider({ children, scenario }: PropsWithChildren<{ scenario: TestScenario }>): JSX.Element {
   const { state, dispatch, error } = useStateTransition<EditorState>({
@@ -52,7 +52,7 @@ export function EditorProvider({ children, scenario }: PropsWithChildren<{ scena
     [dispatch]
   );
 
-  const value: UseStateTransitionResult<EditorState> = {
+  const value: Omit<UseStateTransitionResult<EditorState>, 'dispatchFn'> = {
     state,
     dispatch: externalDispatch as Dispatch<EditorState>,
     error
@@ -63,7 +63,7 @@ export function EditorProvider({ children, scenario }: PropsWithChildren<{ scena
   );
 }
 
-export function useEditor(): UseStateTransitionResult<EditorState> {
+export function useEditor(): Omit<UseStateTransitionResult<EditorState>, 'dispatchFn'> {
   const context = useContext(EditorContext);
   if (!context) {
     throw new Error('useEditor hooks is attempting to be used out side of its provider');

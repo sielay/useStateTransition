@@ -57,7 +57,7 @@ You can pass a function to dispatch to decide which state you dispatch to based 
 
 ```ts
 
-dispatch((currentState, data) => {
+dispatchFn((currentState, data) => {
   if (currentState = 1) {
     return {
       to: 2,
