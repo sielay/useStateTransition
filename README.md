@@ -51,6 +51,27 @@ type Dispatch = (requestedState: StateType, data?: unknown) => void;
 
 You use it to trigger the transition. Transition to the same state won't trigger any updates. If the request create unknown transition `error` will be populated.
 
+#### Conditional dispatch
+
+You can pass a function to dispatch to decide which state you dispatch to based on the current state. It's useful when you dispatch comes from useCallback which would cache the initial state
+
+```ts
+
+dispatch((currentState, data) => {
+  if (currentState = 1) {
+    return {
+      to: 2,
+      data // you can decide to pass the data
+    }
+  }
+  return {
+      to: 3
+      // or to filter out the data
+  }
+}
+
+```
+
 ### error
 
 Display the latest error. At the moment it reports only about unknown transitions.
