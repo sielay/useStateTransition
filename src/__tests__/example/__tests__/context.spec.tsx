@@ -32,50 +32,56 @@ describe('Editor', () => {
 
     expect(queryByText('Invalid')).not.toBeInTheDocument();
 
-    expect(queryByTestId('state').textContent).toEqual(EditorState.INIT);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.INIT);
     expect(queryByText('Load assets')).toBeInTheDocument();
 
-    userEvent.click(queryByText('Load assets'));
+    const loadAssets = queryByText('Load assets');
+    loadAssets && userEvent.click(loadAssets);
     expect(queryByText('Fill with defaults')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.NEW);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.NEW);
 
-    userEvent.click(queryByText('Fill with defaults'));
+    const fillWithDefaults = queryByText('Fill with defaults');
+    fillWithDefaults && userEvent.click(fillWithDefaults);
     expect(queryByText('Modify')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.OPEN);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.OPEN);
 
-    userEvent.click(queryByText('Modify'));
+    const modify = queryByText('Modify');
+    modify && userEvent.click(modify);
     const revert = queryByText('Revert');
     expect(revert).toBeInTheDocument();
     expect(queryByText('Save')).toBeInTheDocument();
-    expect(queryByTestId('modified').textContent).toEqual('true');
-    expect(queryByTestId('state').textContent).toEqual(EditorState.MODIFIED);
+    expect(queryByTestId('modified')?.textContent).toEqual('true');
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.MODIFIED);
 
-    userEvent.click(revert);
+    revert && userEvent.click(revert);
     expect(revert).not.toBeInTheDocument();
     expect(queryByText('Modify')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.OPEN);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.OPEN);
 
-    userEvent.click(queryByText('Modify'));
-    expect(queryByTestId('state').textContent).toEqual(EditorState.MODIFIED);
+    const modify2 = queryByText('Modify');
+    modify2 && userEvent.click(modify2);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.MODIFIED);
 
     // this should come from outside
     fireEvent(window, new MessageEvent('message', { data: 'close' }));
     expect(queryByText('Cancel')).toBeInTheDocument();
-    expect(queryByTestId('modified').textContent).toEqual('true');
+    expect(queryByTestId('modified')?.textContent).toEqual('true');
     expect(queryByText('Save')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.CLOSE);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.CLOSE);
 
-    userEvent.click(queryByText('Cancel'));
+    const cancel = queryByText('Cancel');
+    cancel && userEvent.click(cancel);
     expect(queryByText('Cancel')).not.toBeInTheDocument();
     expect(queryByText('Save')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.MODIFIED);
-    expect(queryByTestId('modified').textContent).toEqual('true');
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.MODIFIED);
+    expect(queryByTestId('modified')?.textContent).toEqual('true');
 
     // this should come from outside
     fireEvent(window, new MessageEvent('message', { data: 'close' }));
-    userEvent.click(queryByText('Save'));
+    const save = queryByText('Save');
+    save && userEvent.click(save);
 
-    await waitFor(() => expect(queryByTestId('modified').textContent).toEqual('false'));
+    await waitFor(() => expect(queryByTestId('modified')?.textContent).toEqual('false'));
     expect(queryByTestId('state')).not.toBeInTheDocument();
   });
 
@@ -89,15 +95,17 @@ describe('Editor', () => {
 
     expect(queryByText('Invalid')).not.toBeInTheDocument();
 
-    expect(queryByTestId('state').textContent).toEqual(EditorState.INIT);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.INIT);
     expect(queryByText('Load assets')).toBeInTheDocument();
 
-    userEvent.click(queryByText('Load assets'));
+    const loadAssets = queryByText('Load assets');
+    loadAssets && userEvent.click(loadAssets);
     expect(queryByText('Load from storage')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.LOAD);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.LOAD);
 
-    userEvent.click(queryByText('Load from storage'));
+    const loadFromStorage = queryByText('Load from storage');
+    loadFromStorage && userEvent.click(loadFromStorage);
     expect(queryByText('Modify')).toBeInTheDocument();
-    expect(queryByTestId('state').textContent).toEqual(EditorState.OPEN);
+    expect(queryByTestId('state')?.textContent).toEqual(EditorState.OPEN);
   });
 });
